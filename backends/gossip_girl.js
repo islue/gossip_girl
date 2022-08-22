@@ -5,7 +5,8 @@ function GossipGirl(startupTime, config, emitter) {
   var self = this
   self.config = config.gossip_girl || []
   self.statsd_config = config
-  self.ignorable = [ "statsd.packets_received", "statsd.bad_lines_seen", "statsd.packet_process_time", "statsd.timestamp_lag" ]
+  self.ignorable = [ "statsd.packets_received", "statsd.bad_lines_seen", "statsd.packet_process_time" ]
+  self.sock = dgram.createSocket("udp4")
 
   emitter.on('flush', function(time_stamp, metrics) { self.process(time_stamp, metrics); })
 }
@@ -35,7 +36,6 @@ GossipGirl.prototype.process = function(time_stamp, metrics) {
     timers: { data: metrics.timers, suffix: "ms", name: "timer" }
   }
 
-  self.sock = dgram.createSocket("udp4")
   for (var i = 0; i < hosts.length; i++) {
     for (type in stats_map) {
       stats = stats_map[type]
@@ -80,6 +80,11 @@ GossipGirl.prototype.process = function(time_stamp, metrics) {
     }
   }
 }
+
+GossipGirl.prototype.stop = function(cb) {
+  this.sock.close();
+  cb();
+};
 
 exports.init = function(startupTime, config, events) {
   var instance = new GossipGirl(startupTime, config, events)
