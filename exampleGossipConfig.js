@@ -28,10 +28,8 @@ Optional Variables:
     {
       "host": "observer.example.com",
       "port": 8125,
-      "packageJoin": true,
-      "packageLimit": 8192,
-      "verbose": true,
-      "delay": 20
+      "packetSize": 8192,
+      "verbose": true
     }
   ],
   "flushInterval": 1000,
